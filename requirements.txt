@@ -1,2 +1,0 @@
-Flask==3.0.0
-reportlab>=3.0.0
