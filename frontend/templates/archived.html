@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Archived Notes - DebugDiary{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Archived Notes</h2>
+    <a href="{{ url_for('notes') }}" class="btn btn-outline-secondary">Back to Notes</a>
+  </div>
+
+  {% if notes %}
+  <div class="row">
+    {% for note in notes %}
+    <div class="col-md-6">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">{{ note.title }}</h5>
+          <p class="card-text text-truncate">{{ note.content }}</p>
+          <p class="mb-1"><small class="text-muted">Category: {{ note.category }}</small></p>
+          <p class="mb-2">{% if note.tags %}{% for t in note.tags.split(',') %}<span class="badge bg-secondary me-1">{{ t }}</span>{% endfor %}{% endif %}</p>
+          <a href="{{ url_for('view_note', id=note.id) }}" class="btn btn-sm btn-primary">View</a>
+          <a href="{{ url_for('restore_note_route', id=note.id) }}" class="btn btn-sm btn-success ms-2">Restore</a>
+          <a href="{{ url_for('permanently_delete_note_route', id=note.id) }}" class="btn btn-sm btn-outline-danger ms-2 permanent-delete-note">Permanently Delete</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+    <p>No archived notes found.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body p-4">
+          <h1 class="h3 mb-2">Add a New Note</h1>
+          <p class="text-muted mb-4">Use this form to save a new debug diary entry.</p>
+          <form id="add-note-form" method="POST" action="{{ url_for('add_note') }}">
+            <div class="mb-3">
+              <label for="title" class="form-label">Title</label>
+              <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="category" class="form-label">Category</label>
+              <select class="form-select" id="category" name="category" required>
+                {% for option in ['Error', 'Command', 'Code Snippet', 'Interview Question', 'Resource'] %}
+                  <option value="{{ option }}" {% if default_category == option %}selected{% endif %}>{{ option }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="content" class="form-label">Content</label>
+              <textarea class="form-control" id="content" name="content" rows="8" required></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label for="tags" class="form-label">Tags</label>
+              <input type="text" class="form-control" id="tags" name="tags" placeholder="Optional tags, comma-separated">
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+              <button type="submit" class="btn btn-primary">Save Note</button>
+              <a class="btn btn-outline-secondary" href="{{ url_for('notes') }}">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
