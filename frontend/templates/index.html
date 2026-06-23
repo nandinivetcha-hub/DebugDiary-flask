@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <section class="hero-section py-5 mb-4">
+    <div class="p-4 p-md-5 rounded-4 bg-white shadow-sm">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h1 class="display-5 fw-bold">DebugDiary</h1>
+          <p class="lead text-muted mb-3">Personal Developer Knowledge Base</p>
+          <p class="mb-0">Store errors, commands, code snippets, interview questions and resources in one place.</p>
+        </div>
+        <div class="col-md-4 mt-4 mt-md-0">
+          <div class="card stats-card border-0 h-100">
+            <div class="card-body text-center">
+              <h5 class="card-title mb-2">Total Notes</h5>
+              <p class="display-6 mb-0">{{ stats.total }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="row row-cols-1 row-cols-md-3 g-3 mb-4">
+    <div class="col">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <p class="text-muted mb-2">Total Notes</p>
+          <h3>{{ stats.total }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <p class="text-muted mb-2">Total Archived Notes</p>
+          <h3>{{ stats.archived }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <p class="text-muted mb-2">Recently Added Notes</p>
+          <h3>{{ stats.recent_count }}</h3>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="row gy-4 mb-4">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+              <h2 class="h5 mb-1">Knowledge Distribution</h2>
+              <p class="text-muted mb-0">Visual breakdown of note categories.</p>
+            </div>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="distributionChart" height="280"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="h5 mb-3">Quick Actions</h2>
+          <div class="d-grid gap-2">
+            {% for category in ['Error', 'Command', 'Code Snippet', 'Interview Question', 'Resource'] %}
+              <a href="{{ url_for('add_note') }}?category={{ category }}" class="btn btn-outline-primary text-start">+ {{ category }}</a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </section>
+
+  <section class="mb-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div>
+            <h2 class="h5 mb-1">Recently Added Notes</h2>
+            <p class="text-muted mb-0">The five newest notes in your diary.</p>
+          </div>
+          <a href="{{ url_for('notes') }}" class="btn btn-sm btn-outline-primary">View All Notes</a>
+        </div>
+
+        {% if recent_notes %}
+          <div class="row g-3">
+            {% for note in recent_notes %}
+              <div class="col-12">
+                <a href="{{ url_for('view_note', id=note.id) }}" class="text-decoration-none text-reset">
+                  <div class="card note-card h-100">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                          <h5 class="card-title mb-1">{{ note.title }}</h5>
+                          <small class="text-muted">Created {{ note.date_added or 'N/A' }}</small>
+                        </div>
+                        <span class="badge rounded-pill {{ note.category | badge_class }}">{{ note.category }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="alert alert-info mb-0">No recent notes yet.</div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+{% block extra_scripts %}
+  <script>
+    const chartData = {
+      labels: ['Errors', 'Commands', 'Code Snippets', 'Interview Questions', 'Resources'],
+      datasets: [{
+        data: [
+            {{ stats.Error }},
+            {{ stats.Command }},
+            {{ stats['Code Snippet'] }},
+            {{ stats['Interview Question'] }},
+            {{ stats.Resource }}
+        ],
+        backgroundColor: ['#dc3545', '#0d6efd', '#198754', '#ffc107', '#6c757d'],
+        borderColor: '#fff',
+        borderWidth: 1,
+      }],
+    };
+
+    const config = {
+      type: 'pie',
+      data: chartData,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+          },
+          title: {
+            display: true,
+            text: 'Knowledge Distribution',
+            padding: {
+              top: 10,
+              bottom: 20,
+            },
+          },
+        },
+      },
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const ctx = document.getElementById('distributionChart');
+      if (ctx) {
+        new Chart(ctx, config);
+      }
+    });
+  </script>
+{% endblock %}
+{% endblock %}
